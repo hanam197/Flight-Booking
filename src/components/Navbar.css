@@ -1,0 +1,94 @@
+.navbar {
+  background-color: #a52a2a; /* Màu nền của navbar */
+  height: 80px; /* Chiều cao của navbar */
+  display: flex; /* Sử dụng flexbox */
+  justify-content: center; /* Căn giữa các phần tử theo chiều ngang */
+  align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+  font-size: 1.5rem; /* Kích thước phông chữ */
+}
+
+.navbar-container {
+  display: flex; /* Sử dụng flexbox */
+  justify-content: space-between; /* Phân bố không gian đều giữa các phần tử */
+  height: 80px; /* Chiều cao của navbar */
+  width: 100%; /* Chiều rộng tối đa của navbar */
+  max-width: 1100px; /* Chiều rộng tối đa của container */
+  padding: 0 24px; /* Khoảng cách giữa các phần tử */
+}
+.navbar-logo:hover {
+  color: #fff;
+}
+.navbar-logo {
+  color: #fff; /* Màu chữ của logo */
+  justify-self: flex-start; /* Đẩy logo về bên trái */
+  cursor: pointer; /* Biến con trỏ thành hình bàn tay khi di chuột qua logo */
+  text-decoration: none; /* Loại bỏ gạch chân của link */
+  font-size: 2rem; /* Kích thước phông chữ của logo */
+}
+
+.nav-menu {
+  display: flex; /* Sử dụng flexbox */
+  align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+  list-style: none; /* Loại bỏ dấu gạch chấm trước mỗi item */
+  text-align: center; /* Căn giữa các phần tử theo chiều ngang */
+  margin-right: -22px; /* Để loại bỏ khoảng cách cuối cùng */
+}
+
+.nav-item {
+  height: 80px; /* Chiều cao của mỗi item */
+}
+
+.nav-links {
+  color: #fff; /* Màu chữ của các liên kết */
+  text-decoration: none; /* Loại bỏ gạch chân của link */
+  padding: 0 1rem; /* Khoảng cách giữa các liên kết */
+  height: 100%; /* Chiều cao của mỗi item */
+  display: flex; /* Sử dụng flexbox */
+  align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+}
+.nav-links:hover {
+  color: #000;
+}
+.menu-icon {
+  display: none; /* Ẩn menu icon khi ở màn hình lớn */
+}
+
+@media screen and (max-width: 960px) {
+  .nav-menu {
+    display: flex; /* Sử dụng flexbox */
+    flex-direction: column; /* Hiển thị các phần tử dọc khi ở màn hình nhỏ */
+    width: 100%; /* Chiều rộng tối đa của menu */
+    height: 90vh; /* Chiều cao của menu */
+    position: absolute; /* Đặt menu ở vị trí tuyệt đối */
+    top: 80px; /* Khoảng cách từ đỉnh navbar đến đỉnh menu */
+    left: -100%; /* Ẩn menu khi không được mở ra */
+    opacity: 1; /* Hiển thị menu */
+    transition: all 0.5s ease; /* Hiệu ứng chuyển động khi mở ra */
+    background: #fff; /* Màu nền của menu */
+  }
+
+  .menu-icon {
+    display: block; /* Hiển thị menu icon khi ở màn hình nhỏ */
+    position: absolute; /* Đặt menu icon ở vị trí tuyệt đối */
+    top: 0; /* Đặt menu icon ở đỉnh navbar */
+    right: 0; /* Đặt menu icon ở phía bên phải của navbar */
+    transform: translate(-100%, 75%); /* Di chuyển menu icon ra khỏi màn hình */
+    font-size: 1.8rem; /* Kích thước phông chữ của menu icon */
+    cursor: pointer; /* Biến con trỏ thành hình bàn tay khi di chuột qua menu icon */
+  }
+
+  .nav-menu.active {
+    background: #242222;
+    left: 0; /* Hiển thị menu ra khi được mở ra */
+    opacity: 1; /* Hiển thị menu */
+    transition: all 0.5s ease; /* Hiệu ứng chuyển động khi mở ra */
+    z-index: 1; /* Hiển thị menu trước các phần tử khác */
+  }
+
+  .nav-links {
+    text-align: center; /* Căn giữa các phần tử theo chiều ngang */
+    padding: 2rem; /* Khoảng cách giữa các liên kết */
+    width: 100%; /* Chiều rộng tối đa của mỗi liên kết */
+    display: table; /* Sử dụng bảng để căn giữa các phần tử */
+  }
+}
