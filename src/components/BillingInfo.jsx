@@ -1,20 +1,23 @@
-import React from 'react';
-import { Redirect, Link } from 'react-router-dom';
-import BookingInFor from './BookingInFor';
-import { connect } from 'react-redux';
-import { formValueSelector } from 'redux-form';
-import { Form, Dropdown, Input } from 'semantic-ui-react';
-import { Field, reduxForm } from 'redux-form';
-import { createTicket } from '../actions'
-import Booking from '../api/Booking';
-import history from '../history';
-import './billingInfo.css'
+import React from "react";
+import { Redirect, Link } from "react-router-dom";
+import BookingInFor from "./BookingInFor";
+import { connect } from "react-redux";
+import { formValueSelector } from "redux-form";
+import { Form, Dropdown, Input } from "semantic-ui-react";
+import { Field, reduxForm } from "redux-form";
+import { createTicket } from "../actions";
+import Booking from "../api/Booking";
+import Transaction from "../api/Transaction";
+import history from "../history";
+import "./billingInfo.css";
+import { Button } from "antd";
+import axios from "axios";
 
 const cardOptions = [
-  { value: 'Visa', text: 'Visa' },
-  { value: 'American Express', text: 'American Express' },
-  { value: 'Mastercard', text: 'Mastercard' }
-]
+  { value: "Visa", text: "Visa" },
+  { value: "American Express", text: "American Express" },
+  { value: "Mastercard", text: "Mastercard" },
+];
 
 const renderSelectField = ({ input, label, placeholder }) => {
   return (
@@ -29,33 +32,27 @@ const renderSelectField = ({ input, label, placeholder }) => {
         options={cardOptions}
       />
     </Form.Field>
-  )
-}
+  );
+};
 
 const renderTextField = ({ input, placeholder, label, meta }) => {
   return (
-    <Form.Field className={`${meta.touched && meta.invalid ? 'error' : ''}`}>
+    <Form.Field className={`${meta.touched && meta.invalid ? "error" : ""}`}>
       <label>{label}</label>
-      <Input type="text"
-        {...input}
-
-        placeholder={placeholder}
-      />
+      <Input type="text" {...input} placeholder={placeholder} />
     </Form.Field>
-  )
-}
-
+  );
+};
 
 function BillingInfo(props) {
-
   const onSubmit = (formValues) => {
     // Đặt vé
     const { type } = props;
-    if(type === 'oneway') {
+    if (type === "oneway") {
       const { passenger } = props;
       const { selectedFlight } = props;
-      Booking.post('/booking/ticket', {
-        buyerName : passenger.firstName + ' ' + passenger.lastName,
+      Booking.post("/booking/ticket", {
+        buyerName: passenger.firstName + " " + passenger.lastName,
         buyerId: passenger.passengerId,
         phoneNumber: passenger.phone,
         email: passenger.email,
@@ -65,27 +62,29 @@ function BillingInfo(props) {
         status: true,
         ticketInfos: [
           {
-            flightId: selectedFlight._id, 
-            passenger: passenger.firstName + ' ' + passenger.lastName,
+            flightId: selectedFlight._id,
+            passenger: passenger.firstName + " " + passenger.lastName,
             passengerId: passenger.passengerId,
             phoneNumber: passenger.phone,
             type: selectedFlight.type,
             price: selectedFlight.totalPrice,
-            seat: props.selectedSeat[0] ? props.selectedSeat[0].id : '',
-            status: true
+            seat: props.selectedSeat[0] ? props.selectedSeat[0].id : "",
+            status: true,
           },
-        ]
-      }).then(res => {
-        props.createTicket(res.data);
-        history.push('/booking-success');
-      }).catch(err => {
-        console.log(err);
+        ],
       })
-    } else if(type ==='roundtrip') {
+        .then((res) => {
+          props.createTicket(res.data);
+          history.push("/booking-success");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else if (type === "roundtrip") {
       const { passenger } = props;
-      const { selectedFlight, selectedReturnFlight} = props;
-      Booking.post('/booking/ticket', {
-        buyerName : passenger.firstName + ' ' + passenger.lastName,
+      const { selectedFlight, selectedReturnFlight } = props;
+      Booking.post("/booking/ticket", {
+        buyerName: passenger.firstName + " " + passenger.lastName,
         buyerId: passenger.passengerId,
         phoneNumber: passenger.phone,
         email: passenger.email,
@@ -95,35 +94,129 @@ function BillingInfo(props) {
         status: true,
         ticketInfos: [
           {
-            flightId: selectedFlight._id, 
-            passenger: passenger.firstName + ' ' + passenger.lastName,
+            flightId: selectedFlight._id,
+            passenger: passenger.firstName + " " + passenger.lastName,
             passengerId: passenger.passengerId,
             phoneNumber: passenger.phone,
             type: selectedFlight.type,
             price: selectedFlight.totalPrice,
-            seat: props.selectedSeat[0] ? props.selectedSeat[0].id : '',
-            status: true
+            seat: props.selectedSeat[0] ? props.selectedSeat[0].id : "",
+            status: true,
           },
           {
-            flightId: selectedReturnFlight._id, 
-            passenger: passenger.firstName + ' ' + passenger.lastName,
+            flightId: selectedReturnFlight._id,
+            passenger: passenger.firstName + " " + passenger.lastName,
             passengerId: passenger.passengerId,
             phoneNumber: passenger.phone,
             type: selectedReturnFlight.type,
             price: selectedReturnFlight.totalPrice,
-            seat: props.selectedReturnSeat[0] ? props.selectedReturnSeat[0].id : '',
-            status: true
-          }
-        ]
-      }).then(res => {
-        props.createTicket(res.data);
-        history.push('/booking-success');
-      }).catch(err => {
-        console.log(err);
+            seat: props.selectedReturnSeat[0]
+              ? props.selectedReturnSeat[0].id
+              : "",
+            status: true,
+          },
+        ],
       })
+        .then((res) => {
+          props.createTicket(res.data);
+          history.push("/booking-success");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-  }
-
+  };
+  const handleOnlinePayment = () => {
+    const { type } = props;
+    if (type === "oneway") {
+      const { passenger } = props;
+      const { selectedFlight } = props;
+      Booking.post("/booking/ticket", {
+        buyerName: passenger.firstName + " " + passenger.lastName,
+        buyerId: passenger.passengerId,
+        phoneNumber: passenger.phone,
+        email: passenger.email,
+        address: passenger.address,
+        dateOfBirth: passenger.birthDay,
+        nationality: passenger.country,
+        status: true,
+        ticketInfos: [
+          {
+            flightId: selectedFlight._id,
+            passenger: passenger.firstName + " " + passenger.lastName,
+            passengerId: passenger.passengerId,
+            phoneNumber: passenger.phone,
+            type: selectedFlight.type,
+            price: selectedFlight.totalPrice,
+            seat: props.selectedSeat[0] ? props.selectedSeat[0].id : "",
+            status: true,
+          },
+        ],
+      })
+        .then((res) => {
+          props.createTicket(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else if (type === "roundtrip") {
+      const { passenger } = props;
+      const { selectedFlight, selectedReturnFlight } = props;
+      Booking.post("/booking/ticket", {
+        buyerName: passenger.firstName + " " + passenger.lastName,
+        buyerId: passenger.passengerId,
+        phoneNumber: passenger.phone,
+        email: passenger.email,
+        address: passenger.address,
+        dateOfBirth: passenger.birthDay,
+        nationality: passenger.country,
+        status: true,
+        ticketInfos: [
+          {
+            flightId: selectedFlight._id,
+            passenger: passenger.firstName + " " + passenger.lastName,
+            passengerId: passenger.passengerId,
+            phoneNumber: passenger.phone,
+            type: selectedFlight.type,
+            price: selectedFlight.totalPrice,
+            seat: props.selectedSeat[0] ? props.selectedSeat[0].id : "",
+            status: true,
+          },
+          {
+            flightId: selectedReturnFlight._id,
+            passenger: passenger.firstName + " " + passenger.lastName,
+            passengerId: passenger.passengerId,
+            phoneNumber: passenger.phone,
+            type: selectedReturnFlight.type,
+            price: selectedReturnFlight.totalPrice,
+            seat: props.selectedReturnSeat[0]
+              ? props.selectedReturnSeat[0].id
+              : "",
+            status: true,
+          },
+        ],
+      })
+        .then((res) => {
+          props.createTicket(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    Transaction.post("/transaction/create_payment_url", {
+      amount: "100000",
+      orderId: "AH1510181",
+    })
+      .then((response) => {
+        // Khi nhận được response từ API, chuyển hướng người dùng đến trang thanh toán
+        window.location.href = response.data;
+        console.log(response.data);
+      })
+      .catch((error) => {
+        // Xử lý khi gọi API thất bại
+        console.error(error);
+      });
+  };
   const renderServices = () => {
     return (
       <div className="ui container grid" style={{ marginTop: 20 }}>
@@ -137,17 +230,30 @@ function BillingInfo(props) {
             <div className="fields">
               <div className="seven wide field">
                 <label>Số thẻ</label>
-                <input type="text" name="card[number]" maxlength="16" placeholder="Card #" />
+                <input
+                  type="text"
+                  name="card[number]"
+                  maxlength="16"
+                  placeholder="Card #"
+                />
               </div>
               <div className="three wide field">
                 <label>CVC</label>
-                <input type="text" name="card[cvc]" maxlength="3" placeholder="CVC" />
+                <input
+                  type="text"
+                  name="card[cvc]"
+                  maxlength="3"
+                  placeholder="CVC"
+                />
               </div>
               <div className="six wide field">
                 <label>Hạn thẻ</label>
                 <div className="two fields">
                   <div className="field">
-                    <select className="ui fluid search dropdown" name="card[expire-month]">
+                    <select
+                      className="ui fluid search dropdown"
+                      name="card[expire-month]"
+                    >
                       <option value="">Month</option>
                       <option value="1">January</option>
                       <option value="2">February</option>
@@ -164,12 +270,24 @@ function BillingInfo(props) {
                     </select>
                   </div>
                   <div className="field">
-                    <input type="text" name="card[expire-year]" maxlength="4" placeholder="Year" />
+                    <input
+                      type="text"
+                      name="card[expire-year]"
+                      maxlength="4"
+                      placeholder="Year"
+                    />
                   </div>
                 </div>
               </div>
             </div>
-            <div className="div" style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: '35px' }}>
+            <div
+              className="div"
+              style={{
+                display: "flex",
+                justifyContent: "space-evenly",
+                marginTop: "35px",
+              }}
+            >
               <Link to="/select-service" className="ui button">
                 Quay lại
               </Link>
@@ -178,65 +296,87 @@ function BillingInfo(props) {
               </button>
             </div>
           </Form>
-
         </div>
         <div className="five wide column">
+          <Button onClick={handleOnlinePayment}>
+            Thanh toán Online Với VNPAY
+          </Button>
           <BookingInFor />
         </div>
       </div>
-    )
-  }
+    );
+  };
 
-  if(!props.startFrom) 
-    return <Redirect to="/" />
+  if (!props.startFrom) return <Redirect to="/" />;
 
   return (
     <div className="billingBackground">
       <div className="ui container wrapper">
         <div className="search__info">
-          {props.type === 'oneway' && <h3>CHUYẾN BAY MỘT CHIỀU | 1 Người lớn</h3>}
-          {props.type === 'roundtrip' && <h3>CHUYẾN BAY KHỨ HỒI | 1 Người lớn</h3>}
+          {props.type === "oneway" && (
+            <h3>CHUYẾN BAY MỘT CHIỀU | 1 Người lớn</h3>
+          )}
+          {props.type === "roundtrip" && (
+            <h3>CHUYẾN BAY KHỨ HỒI | 1 Người lớn</h3>
+          )}
           <div className="desciption">
             <p style={{ marginRight: 20 }}>
-              <i style={{ marginRight: 10 }} className="fas fa-map-marker-alt"></i>
+              <i
+                style={{ marginRight: 10 }}
+                className="fas fa-map-marker-alt"
+              ></i>
               Điểm Khởi hành <span>{props.startFrom.name}</span>
             </p>
             <p>
-              <i style={{ marginRight: 10 }} className="fas fa-map-marker-alt"></i>
+              <i
+                style={{ marginRight: 10 }}
+                className="fas fa-map-marker-alt"
+              ></i>
               Điểm đến <span>{props.destination.name}</span>
             </p>
           </div>
         </div>
         <div className="icons">
-          <i style={{ color: '#fff', fontSize: '32px' }} className="fas fa-user-circle"></i>
+          <i
+            style={{ color: "#fff", fontSize: "32px" }}
+            className="fas fa-user-circle"
+          ></i>
         </div>
       </div>
       {renderServices()}
-
     </div>
-  )
+  );
 }
 
-const selector = formValueSelector('passenger');
-const selectorBooking = formValueSelector('FormBooking');
+const selector = formValueSelector("passenger");
+const selectorBooking = formValueSelector("FormBooking");
 const mapStateToProps = (state) => {
   return {
-    startFrom: selectorBooking(state, 'startFrom'),
-    destination: selectorBooking(state, 'destination'),
-    type: selectorBooking(state, 'type'),
+    startFrom: selectorBooking(state, "startFrom"),
+    destination: selectorBooking(state, "destination"),
+    type: selectorBooking(state, "type"),
     flights: Object.values(state.flights),
     selectedFlight: state.selectedFlight,
-    passenger: selector(state, 'firstName', 'lastName', 'address', 'email', 'phone', 'birthDay', 'country', 'passengerId'),
+    passenger: selector(
+      state,
+      "firstName",
+      "lastName",
+      "address",
+      "email",
+      "phone",
+      "birthDay",
+      "country",
+      "passengerId"
+    ),
     selectedSeat: Object.values(state.selectedSeat),
 
     selectedReturnFlight: state.selectedReturnFlight,
     selectedReturnSeat: Object.values(state.selectedReturnSeat),
-
-  }
-}
+  };
+};
 
 const BillingInfoForm = reduxForm({
-  form: 'billingInfoForm',
+  form: "billingInfoForm",
 })(BillingInfo);
 
 export default connect(mapStateToProps, { createTicket })(BillingInfoForm);

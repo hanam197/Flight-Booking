@@ -9,7 +9,7 @@ const airlinerRouter = require("./route/airliner.route");
 const flightRouter = require("./route/flight.route");
 const ticketRouter = require("./route/ticket.route");
 const bookingRouter = require("./route/booking.route");
-
+const TransactionRoute = require("./route/transaction.route");
 const { port, mongoUrl, corsOrigin } = key;
 
 const app = express();
@@ -42,7 +42,7 @@ app.use("/flight", flightRouter);
 app.use("/ticket", ticketRouter);
 
 app.use("/booking", bookingRouter);
-
+app.use("/transaction", TransactionRoute);
 app.use(function (req, res) {
   res.status(404).json({ errors: ["Not found"] });
 });

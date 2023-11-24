@@ -1,12 +1,13 @@
 import { combineReducers } from "redux";
-import authReducer from './authReducer';
-import admins from './adminReducer';
+import authReducer from "./authReducer";
+import admins from "./adminReducer";
 import { reducer as formReducer } from "redux-form";
-import flightReducer from './flightReducer';
+import flightReducer from "./flightReducer";
 import AirlinerReducer from "./AirlinerReducer";
-import alert from './alertReducer';
+import alert from "./alertReducer";
 import airportReducer from "./airportReducer";
-import bookingReducer from './bookingReducer';
+import bookingReducer from "./bookingReducer";
+import transactionReducer from "./transactionReducer";
 
 export default combineReducers({
   auth: authReducer,
@@ -17,4 +18,5 @@ export default combineReducers({
   airliners: AirlinerReducer,
   airports: airportReducer,
   bookings: bookingReducer,
+  transaction: transactionReducer,
 });

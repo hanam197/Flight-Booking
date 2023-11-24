@@ -27,6 +27,7 @@ import {
   FETCH_BOOKINGS,
   CLEAR_BOOKINGS,
   DELETE_BOOKING,
+  FETCH_TRANSACTION,
 } from "./type";
 import axiosJWT from "../api/axiosJWT";
 import axios from "axios";
@@ -483,4 +484,12 @@ export const deleteBooking = (bookingId) => async (dispatch) => {
   setTimeout(() => {
     dispatch(hideAlert());
   }, 3000);
+};
+export const fetchTransactions = () => async (dispatch) => {
+  const res = await axios.get("/transaction/all");
+  console.log(res.data);
+  dispatch({
+    type: FETCH_TRANSACTION,
+    payload: res.data,
+  });
 };
